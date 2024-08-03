@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Image to PDF Converter</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var el = document.getElementById('sortable-images');
+            var sortable = Sortable.create(el, {
+                onEnd: function (evt) {
+                    var items = sortable.toArray().map(id => document.getElementById(id).getAttribute('data-index'));
+                    fetch('/reorder', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ order: items })
+                    }).then(response => response.json()).then(data => {
+                        if (data.success) {
+                            console.log("Order updated successfully");
+                        } else {
+                            console.error("Failed to update order");
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Upload Images to Convert to PDF</h1>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="files" multiple accept="image/*">
+        <input type="submit" value="Upload Images">
+    </form>
+    <h2>Uploaded Images:</h2>
+    <ul id="sortable-images">
+        {% for image in images %}
+            <li id="item-{{ loop.index0 }}" data-index="{{ loop.index0 }}">
+                <img src="{{ url_for('uploaded_file', filename=image.split('/')[-1]) }}" style="max-width: 200px;"/>
+            </li>
+        {% endfor %}
+    </ul>
+    <form action="/convert" method="get">
+        <input type="submit" value="Convert to PDF">
+    </form>
+    <form action="/clear" method="get">
+        <input type="submit" value="Clear Images">
+    </form>
+</body>
+</html>
