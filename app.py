@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads/'
-app.secret_key = 'supersecretkey'
+# app.secret_key = 'supersecretkey'
 
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
@@ -69,7 +69,7 @@ def convert_to_pdf():
             print(f"Error saving PDF: {e}")
             return "Error converting to PDF", 500
     
-    session.pop('images', None)  # Hapus daftar gambar dari sesi setelah konversi
+    session.pop('images', None)
     return redirect(url_for('download_file', filename='output.pdf'))
 
 @app.route('/download/<filename>')
@@ -82,7 +82,7 @@ def download_file(filename):
     def remove_file(response):
         try:
             os.remove(file_path)
-            clear_upload_folder()  # Hapus semua gambar dari folder uploads setelah pengunduhan
+            clear_upload_folder()
         except Exception as error:
             app.logger.error("Error removing or closing downloaded file handle", error)
         return response
