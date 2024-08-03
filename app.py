@@ -31,7 +31,7 @@ def upload_files():
             file.save(file_path)
             session['images'].append(file_path)
     
-    session.modified = True  # Pastikan sesi diperbarui setelah menambahkan gambar
+    session.modified = True 
     return redirect(url_for('index'))
 
 @app.route('/reorder', methods=['POST'])
